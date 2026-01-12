@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <title>OPR SJKC Kong Min 1 - Versi Asal + Logo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        body { background-color: #f4f7f6; padding: 15px; font-family: sans-serif; }
+        .container { max-width: 800px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        
+        #pdf-area { position: absolute; left: -9999px; top: 0; }
+        
+        .report-page { 
+            width: 7.9in; 
+            padding: 0.3in; 
+            background: white; 
+            display: flex; 
+            flex-direction: column;
+        }
+
+        /* Header dengan Logo */
+        .header-table { width: 100%; border-bottom: 2px solid black; margin-bottom: 8px; }
+        .header-table td { border: none !important; padding: 2px !important; vertical-align: middle; }
+        
+        .pdf-table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+        .pdf-table th, .pdf-table td { 
+            border: 1px solid black; 
+            padding: 5px 8px; 
+            font-size: 8.5pt; 
+            vertical-align: top;
+            word-wrap: break-word;
+        }
+        .pdf-table th { width: 20%; background-color: #f2f2f2; text-align: left; }
+        
+        .grid-gambar { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 6px; 
+            margin-bottom: 10px;
+        }
+        .img-container { 
+            height: 120px; 
+            border: 1px solid #eee; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        .img-container img { max-height: 100%; max-width: 100%; object-fit: contain; }
+        
+        .footer-sig { 
+            display: flex; 
+            justify-content: space-between; 
+            font-size: 9pt; 
+            margin-top: auto;
+            padding-top: 10px;
+        }
+        .sig-box { width: 40%; }
+        .sig-line { border-bottom: 1px solid black; width: 100%; display: block; height: 30px; margin-bottom: 5px; }
+        .name-bold { font-weight: bold; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+
+<div class="container no-print">
+    <h4 class="text-center fw-bold mb-3">PENJANA OPR SJKC KM1 (VERSI ASAL + LOGO)</h4>
+    <form id="formOPR">
+        <div class="row g-2">
+            <div class="col-12"><label class="small fw-bold">NAMA PROGRAM</label><input type="text" id="in1" class="form-control form-control-sm"></div>
+            <div class="col-md-6"><label class="small fw-bold">ANJURAN</label><input type="text" id="in2" class="form-control form-control-sm"></div>
+            <div class="col-md-3"><label class="small fw-bold">TARIKH</label><input type="date" id="in3" class="form-control form-control-sm"></div>
+            <div class="col-md-3"><label class="small fw-bold">MASA</label><input type="text" id="in4" class="form-control form-control-sm"></div>
+            <div class="col-md-6"><label class="small fw-bold">TEMPAT</label><input type="text" id="in5" class="form-control form-control-sm"></div>
+            <div class="col-md-6"><label class="small fw-bold">SASARAN</label><input type="text" id="in6" class="form-control form-control-sm"></div>
+            <div class="col-md-6"><label class="small fw-bold">OBJEKTIF</label><textarea id="in7" class="form-control form-control-sm" rows="2"></textarea></div>
+            <div class="col-md-6"><label class="small fw-bold">AKTIVITI</label><textarea id="in8" class="form-control form-control-sm" rows="2"></textarea></div>
+            <div class="col-md-6"><label class="small fw-bold">KEKUATAN</label><textarea id="in9" class="form-control form-control-sm" rows="2"></textarea></div>
+            <div class="col-md-6"><label class="small fw-bold">KELEMAHAN</label><textarea id="in10" class="form-control form-control-sm" rows="2"></textarea></div>
+            <div class="col-md-6"><label class="small fw-bold">DISEDIAKAN OLEH:</label><input type="text" id="inPenyedia" class="form-control form-control-sm"></div>
+            <div class="col-md-6"><label class="small fw-bold">DISAHKAN OLEH:</label><input type="text" id="inPengesah" class="form-control form-control-sm"></div>
+            <div class="col-12"><label class="small fw-bold">GAMBAR (1-4)</label><input type="file" id="inImg" class="form-control form-control-sm" multiple></div>
+        </div>
+        <button type="button" onclick="buatPDF()" class="btn btn-primary w-100 mt-3 fw-bold">JANA PDF</button>
+    </form>
+</div>
+
+<div id="pdf-area">
+    <div class="report-page" id="pdf-content">
+        <table class="header-table">
+            <tr>
+                <td style="width: 15%;"><img src="https://i.postimg.cc/PJwfS3KM/Jata-Malaysia-V2-svg.png" height="40"></td>
+                <td style="text-align: center;">
+                    <div style="font-size: 11pt; font-weight: bold;">LAPORAN ONE PAGE REPORT (OPR)</div>
+                    <div style="font-size: 11pt; font-weight: bold;">SJKC KONG MIN CAWANGAN SATU</div>
+                </td>
+                <td style="width: 15%; text-align: right;"><img src="https://i.postimg.cc/fR4SQX9P/SJKC-KONG-MIN-CAWANGAN-SATU.png" height="40"></td>
+            </tr>
+        </table>
+
+        <table class="pdf-table">
+            <tr><th>Program</th><td colspan="3" id="out1" style="font-weight:bold; text-transform:uppercase;"></td></tr>
+            <tr>
+                <th>Anjuran</th><td id="out2"></td>
+                <th style="width:15%">Tarikh/Masa</th><td id="out34"></td>
+            </tr>
+            <tr>
+                <th>Tempat</th><td id="out5"></td>
+                <th>Sasaran</th><td id="out6"></td>
+            </tr>
+            <tr><th>Objektif</th><td colspan="3" id="out7"></td></tr>
+            <tr><th>Aktiviti</th><td colspan="3" id="out8"></td></tr>
+            <tr><th>Kekuatan</th><td colspan="3" id="out9"></td></tr>
+            <tr><th>Kelemahan</th><td colspan="3" id="out10"></td></tr>
+        </table>
+
+        <div class="grid-gambar" id="outImg"></div>
+
+        <div class="footer-sig">
+            <div class="sig-box">
+                Disediakan oleh:<br>
+                <span class="sig-line"></span><br>
+                (<span id="outPenyedia" class="name-bold"></span>)
+            </div>
+            <div class="sig-box" style="text-align: right;">
+                Disahkan oleh:<br>
+                <span class="sig-line"></span><br>
+                (<span id="outPengesah" class="name-bold"></span>)
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function buatPDF() {
+        document.getElementById('out1').innerText = document.getElementById('in1').value;
+        document.getElementById('out2').innerText = document.getElementById('in2').value;
+        document.getElementById('out34').innerText = document.getElementById('in3').value + " / " + document.getElementById('in4').value;
+        document.getElementById('out5').innerText = document.getElementById('in5').value;
+        document.getElementById('out6').innerText = document.getElementById('in6').value;
+        document.getElementById('out7').innerText = document.getElementById('in7').value;
+        document.getElementById('out8').innerText = document.getElementById('in8').value;
+        document.getElementById('out9').innerText = document.getElementById('in9').value;
+        document.getElementById('out10').innerText = document.getElementById('in10').value;
+        document.getElementById('outPenyedia').innerText = document.getElementById('inPenyedia').value.toUpperCase() || "                ";
+        document.getElementById('outPengesah').innerText = document.getElementById('inPengesah').value.toUpperCase() || "                ";
+
+        const outImg = document.getElementById('outImg');
+        outImg.innerHTML = '';
+        const files = Array.from(document.getElementById('inImg').files).slice(0, 4);
+        for(const f of files) {
+            const url = await new Promise(r => { const rd = new FileReader(); rd.onload = e => r(e.target.result); rd.readAsDataURL(f); });
+            outImg.innerHTML += `<div class="img-container"><img src="${url}"></div>`;
+        }
+
+        setTimeout(() => {
+            const element = document.getElementById('pdf-content');
+            html2pdf().set({
+                margin: 0.2,
+                filename: 'OPR_FINAL_KM1.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+            }).from(element).save();
+        }, 1000);
+    }
+</script>
+</body>
+</html>
