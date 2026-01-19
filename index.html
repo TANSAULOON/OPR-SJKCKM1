@@ -2,22 +2,17 @@
 <html lang="ms">
 <head>
     <meta charset="UTF-8">
-    <title>OPR SJKC Kong Min 1 - Versi Laju</title>
+    <title>OPR SJKC Kong Min 1 - Versi Kilat</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         body { background-color: #f4f7f6; padding: 15px; font-family: sans-serif; }
         .container { max-width: 800px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
         
-        /* Skrin Loading */
+        /* Skrin Loading yang lebih jelas */
         #loading-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.9);
-            z-index: 9999;
-            text-align: center;
-            padding-top: 20%;
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 9999; color: white; text-align: center; padding-top: 20%;
         }
 
         #pdf-area { position: absolute; left: -9999px; top: 0; }
@@ -26,29 +21,28 @@
         .header-table td { border: none !important; padding: 5px !important; vertical-align: middle; }
         
         .pdf-table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
-        .pdf-table th, .pdf-table td { border: 1px solid black; padding: 5px 8px; font-size: 8.5pt; vertical-align: top; word-wrap: break-word; }
-        .pdf-table th { width: 20%; background-color: #f2f2f2; text-align: left; }
+        .pdf-table th, .pdf-table td { border: 1px solid black; padding: 5px 8px; font-size: 8.5pt; vertical-align: top; }
+        .pdf-table th { width: 20%; background-color: #f2f2f2; }
         
         .grid-gambar { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 10px; }
-        .img-container { height: 120px; border: 1px solid #eee; display: flex; align-items: center; justify-content: center; }
+        .img-container { height: 150px; border: 1px solid #eee; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         .img-container img { max-height: 100%; max-width: 100%; object-fit: contain; }
         
         .footer-sig { display: flex; justify-content: space-between; font-size: 9pt; margin-top: auto; padding-top: 10px; }
         .sig-box { width: 40%; }
         .sig-line { border-bottom: 1px solid black; width: 100%; display: block; height: 30px; margin-bottom: 5px; }
-        .name-bold { font-weight: bold; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
 <div id="loading-overlay">
-    <div class="spinner-border text-primary" role="status"></div>
-    <h3 class="mt-3">Sedang Menjana PDF...</h3>
-    <p>Sila tunggu sebentar, jangan tutup halaman ini.</p>
+    <div class="spinner-border text-light mb-3"></div>
+    <h3 id="status-text">Sedang Memproses Gambar...</h3>
+    <p>Mohon tunggu, kami sedang mengecilkan saiz gambar anda agar PDF lebih laju.</p>
 </div>
 
 <div class="container no-print">
-    <h4 class="text-center fw-bold mb-3">PENJANA OPR SJKC KM1</h4>
+    <h4 class="text-center fw-bold mb-3">PENJANA OPR SJKC KM1 (VERSI KILAT)</h4>
     <form id="formOPR">
         <div class="row g-2">
             <div class="col-12"><label class="small fw-bold">NAMA PROGRAM</label><input type="text" id="in1" class="form-control form-control-sm"></div>
@@ -63,9 +57,9 @@
             <div class="col-md-6"><label class="small fw-bold">KELEMAHAN</label><textarea id="in10" class="form-control form-control-sm" rows="2"></textarea></div>
             <div class="col-md-6"><label class="small fw-bold">DISEDIAKAN OLEH:</label><input type="text" id="inPenyedia" class="form-control form-control-sm"></div>
             <div class="col-md-6"><label class="small fw-bold">DISAHKAN OLEH:</label><input type="text" id="inPengesah" class="form-control form-control-sm"></div>
-            <div class="col-12"><label class="small fw-bold text-danger">GAMBAR (Maksimum 4 keping, sebaiknya saiz kecil)</label><input type="file" id="inImg" class="form-control form-control-sm" multiple></div>
+            <div class="col-12"><label class="small fw-bold text-primary">MASUKKAN GAMBAR (1-4)</label><input type="file" id="inImg" class="form-control form-control-sm" multiple accept="image/*"></div>
         </div>
-        <button type="button" onclick="buatPDF()" id="btnJana" class="btn btn-primary w-100 mt-3 fw-bold shadow">JANA PDF</button>
+        <button type="button" onclick="prosesDanJana()" id="btnJana" class="btn btn-danger w-100 mt-3 fw-bold shadow">JANA PDF SEKARANG</button>
     </form>
 </div>
 
@@ -83,15 +77,9 @@
         </table>
 
         <table class="pdf-table">
-            <tr><th>Program</th><td colspan="3" id="out1" style="font-weight:bold; text-transform:uppercase;"></td></tr>
-            <tr>
-                <th>Anjuran</th><td id="out2"></td>
-                <th style="width:15%">Tarikh/Masa</th><td id="out34"></td>
-            </tr>
-            <tr>
-                <th>Tempat</th><td id="out5"></td>
-                <th>Sasaran</th><td id="out6"></td>
-            </tr>
+            <tr><th>Program</th><td colspan="3" id="out1" style="font-weight:bold;"></td></tr>
+            <tr><th>Anjuran</th><td id="out2"></td><th style="width:15%">Tarikh/Masa</th><td id="out34"></td></tr>
+            <tr><th>Tempat</th><td id="out5"></td><th>Sasaran</th><td id="out6"></td></tr>
             <tr><th>Objektif</th><td colspan="3" id="out7"></td></tr>
             <tr><th>Aktiviti</th><td colspan="3" id="out8"></td></tr>
             <tr><th>Kekuatan</th><td colspan="3" id="out9"></td></tr>
@@ -101,26 +89,43 @@
         <div class="grid-gambar" id="outImg"></div>
 
         <div class="footer-sig">
-            <div class="sig-box">
-                Disediakan oleh:<br>
-                <span class="sig-line"></span><br>
-                (<span id="outPenyedia" class="name-bold"></span>)
-            </div>
-            <div class="sig-box" style="text-align: right;">
-                Disahkan oleh:<br>
-                <span class="sig-line"></span><br>
-                (<span id="outPengesah" class="name-bold"></span>)
-            </div>
+            <div class="sig-box">Disediakan oleh:<br><span class="sig-line"></span>(<span id="outPenyedia" style="font-weight:bold;text-transform:uppercase;"></span>)</div>
+            <div class="sig-box" style="text-align: right;">Disahkan oleh:<br><span class="sig-line"></span>(<span id="outPengesah" style="font-weight:bold;text-transform:uppercase;"></span>)</div>
         </div>
     </div>
 </div>
 
 <script>
-    async function buatPDF() {
+    // FUNGSI PENTING: Mengecilkan saiz gambar sebelum masuk PDF
+    async function resizeImage(file) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    const max = 800; // Saiz maksimum 800px (Sangat cukup untuk PDF)
+                    if (width > height) { if (width > max) { height *= max / width; width = max; } }
+                    else { if (height > max) { width *= max / height; height = max; } }
+                    canvas.width = width; canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    resolve(canvas.toDataURL('image/jpeg', 0.7)); // Kualiti 0.7 (Ringan & Jelas)
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    async function prosesDanJana() {
         const loading = document.getElementById('loading-overlay');
+        const status = document.getElementById('status-text');
         loading.style.display = 'block';
 
-        // Isi Data
+        // 1. Ambil Data Teks
         document.getElementById('out1').innerText = document.getElementById('in1').value;
         document.getElementById('out2').innerText = document.getElementById('in2').value;
         document.getElementById('out34').innerText = document.getElementById('in3').value + " / " + document.getElementById('in4').value;
@@ -130,35 +135,34 @@
         document.getElementById('out8').innerText = document.getElementById('in8').value;
         document.getElementById('out9').innerText = document.getElementById('in9').value;
         document.getElementById('out10').innerText = document.getElementById('in10').value;
-        document.getElementById('outPenyedia').innerText = document.getElementById('inPenyedia').value.toUpperCase() || "                ";
-        document.getElementById('outPengesah').innerText = document.getElementById('inPengesah').value.toUpperCase() || "                ";
+        document.getElementById('outPenyedia').innerText = document.getElementById('inPenyedia').value || "                ";
+        document.getElementById('outPengesah').innerText = document.getElementById('inPengesah').value || "                ";
 
+        // 2. Proses Gambar (Kecilkan Saiz)
         const outImg = document.getElementById('outImg');
         outImg.innerHTML = '';
         const files = Array.from(document.getElementById('inImg').files).slice(0, 4);
         
-        // Load gambar aktiviti
-        for(const f of files) {
-            const url = await new Promise(r => { const rd = new FileReader(); rd.onload = e => r(e.target.result); rd.readAsDataURL(f); });
-            outImg.innerHTML += `<div class="img-container"><img src="${url}"></div>`;
+        for (let i = 0; i < files.length; i++) {
+            status.innerText = `Mengecilkan Gambar ${i+1}...`;
+            const smallImgData = await resizeImage(files[i]);
+            outImg.innerHTML += `<div class="img-container"><img src="${smallImgData}"></div>`;
         }
 
-        // Jalankan html2pdf
-        const element = document.getElementById('pdf-content');
-        const opt = {
-            margin: 0.2,
-            filename: 'OPR_SJKCKM1.pdf',
-            image: { type: 'jpeg', quality: 0.90 }, // Kurangkan kualiti sedikit untuk kelajuan
-            html2canvas: { scale: 1.5, useCORS: true }, // Scale 1.5 sudah cukup jelas dan laju
-            jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-        };
-
-        html2pdf().set(opt).from(element).save().then(() => {
-            loading.style.display = 'none';
-        }).catch(err => {
-            alert("Ralat menjana PDF. Cuba gunakan gambar yang lebih kecil.");
-            loading.style.display = 'none';
-        });
+        // 3. Jana PDF
+        status.innerText = "Membina Fail PDF...";
+        setTimeout(() => {
+            const element = document.getElementById('pdf-content');
+            html2pdf().set({
+                margin: 0.2,
+                filename: 'OPR_KM1_PANTAS.pdf',
+                image: { type: 'jpeg', quality: 0.8 },
+                html2canvas: { scale: 1.5, useCORS: true },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+            }).from(element).save().then(() => {
+                loading.style.display = 'none';
+            });
+        }, 500);
     }
 </script>
 </body>
