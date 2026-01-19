@@ -2,58 +2,38 @@
 <html lang="ms">
 <head>
     <meta charset="UTF-8">
-    <title>OPR SJKC Kong Min 1 - Versi Logo Stabil</title>
+    <title>OPR SJKC Kong Min 1 - Versi Laju</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         body { background-color: #f4f7f6; padding: 15px; font-family: sans-serif; }
         .container { max-width: 800px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
         
-        #pdf-area { position: absolute; left: -9999px; top: 0; }
-        
-        .report-page { 
-            width: 7.9in; 
-            padding: 0.4in; 
-            background: white; 
-            display: flex; 
-            flex-direction: column;
+        /* Skrin Loading */
+        #loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.9);
+            z-index: 9999;
+            text-align: center;
+            padding-top: 20%;
         }
 
+        #pdf-area { position: absolute; left: -9999px; top: 0; }
+        .report-page { width: 7.9in; padding: 0.4in; background: white; display: flex; flex-direction: column; }
         .header-table { width: 100%; border-bottom: 2px solid black; margin-bottom: 8px; }
         .header-table td { border: none !important; padding: 5px !important; vertical-align: middle; }
         
         .pdf-table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
-        .pdf-table th, .pdf-table td { 
-            border: 1px solid black; 
-            padding: 5px 8px; 
-            font-size: 8.5pt; 
-            vertical-align: top;
-            word-wrap: break-word;
-        }
+        .pdf-table th, .pdf-table td { border: 1px solid black; padding: 5px 8px; font-size: 8.5pt; vertical-align: top; word-wrap: break-word; }
         .pdf-table th { width: 20%; background-color: #f2f2f2; text-align: left; }
         
-        .grid-gambar { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 6px; 
-            margin-bottom: 10px;
-        }
-        .img-container { 
-            height: 120px; 
-            border: 1px solid #eee; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-        }
+        .grid-gambar { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 10px; }
+        .img-container { height: 120px; border: 1px solid #eee; display: flex; align-items: center; justify-content: center; }
         .img-container img { max-height: 100%; max-width: 100%; object-fit: contain; }
         
-        .footer-sig { 
-            display: flex; 
-            justify-content: space-between; 
-            font-size: 9pt; 
-            margin-top: auto;
-            padding-top: 10px;
-        }
+        .footer-sig { display: flex; justify-content: space-between; font-size: 9pt; margin-top: auto; padding-top: 10px; }
         .sig-box { width: 40%; }
         .sig-line { border-bottom: 1px solid black; width: 100%; display: block; height: 30px; margin-bottom: 5px; }
         .name-bold { font-weight: bold; text-transform: uppercase; }
@@ -61,8 +41,14 @@
 </head>
 <body>
 
+<div id="loading-overlay">
+    <div class="spinner-border text-primary" role="status"></div>
+    <h3 class="mt-3">Sedang Menjana PDF...</h3>
+    <p>Sila tunggu sebentar, jangan tutup halaman ini.</p>
+</div>
+
 <div class="container no-print">
-    <h4 class="text-center fw-bold mb-3">PENJANA OPR (FIX LOGO & GAMBAR)</h4>
+    <h4 class="text-center fw-bold mb-3">PENJANA OPR SJKC KM1</h4>
     <form id="formOPR">
         <div class="row g-2">
             <div class="col-12"><label class="small fw-bold">NAMA PROGRAM</label><input type="text" id="in1" class="form-control form-control-sm"></div>
@@ -77,9 +63,9 @@
             <div class="col-md-6"><label class="small fw-bold">KELEMAHAN</label><textarea id="in10" class="form-control form-control-sm" rows="2"></textarea></div>
             <div class="col-md-6"><label class="small fw-bold">DISEDIAKAN OLEH:</label><input type="text" id="inPenyedia" class="form-control form-control-sm"></div>
             <div class="col-md-6"><label class="small fw-bold">DISAHKAN OLEH:</label><input type="text" id="inPengesah" class="form-control form-control-sm"></div>
-            <div class="col-12"><label class="small fw-bold">GAMBAR (1-4)</label><input type="file" id="inImg" class="form-control form-control-sm" multiple></div>
+            <div class="col-12"><label class="small fw-bold text-danger">GAMBAR (Maksimum 4 keping, sebaiknya saiz kecil)</label><input type="file" id="inImg" class="form-control form-control-sm" multiple></div>
         </div>
-        <button type="button" onclick="buatPDF()" id="btnJana" class="btn btn-primary w-100 mt-3 fw-bold">JANA PDF</button>
+        <button type="button" onclick="buatPDF()" id="btnJana" class="btn btn-primary w-100 mt-3 fw-bold shadow">JANA PDF</button>
     </form>
 </div>
 
@@ -131,11 +117,10 @@
 
 <script>
     async function buatPDF() {
-        const btn = document.getElementById('btnJana');
-        btn.innerText = "Sedang Memproses Gambar...";
-        btn.disabled = true;
+        const loading = document.getElementById('loading-overlay');
+        loading.style.display = 'block';
 
-        // Isi Data Teks
+        // Isi Data
         document.getElementById('out1').innerText = document.getElementById('in1').value;
         document.getElementById('out2').innerText = document.getElementById('in2').value;
         document.getElementById('out34').innerText = document.getElementById('in3').value + " / " + document.getElementById('in4').value;
@@ -148,49 +133,32 @@
         document.getElementById('outPenyedia').innerText = document.getElementById('inPenyedia').value.toUpperCase() || "                ";
         document.getElementById('outPengesah').innerText = document.getElementById('inPengesah').value.toUpperCase() || "                ";
 
-        // Proses Gambar Aktiviti
         const outImg = document.getElementById('outImg');
         outImg.innerHTML = '';
         const files = Array.from(document.getElementById('inImg').files).slice(0, 4);
         
-        const imagePromises = files.map(f => {
-            return new Promise(r => {
-                const rd = new FileReader();
-                rd.onload = e => {
-                    const img = new Image();
-                    img.onload = () => r(img);
-                    img.src = e.target.result;
-                    const div = document.createElement('div');
-                    div.className = 'img-container';
-                    div.appendChild(img);
-                    outImg.appendChild(div);
-                };
-                rd.readAsDataURL(f);
-            });
+        // Load gambar aktiviti
+        for(const f of files) {
+            const url = await new Promise(r => { const rd = new FileReader(); rd.onload = e => r(e.target.result); rd.readAsDataURL(f); });
+            outImg.innerHTML += `<div class="img-container"><img src="${url}"></div>`;
+        }
+
+        // Jalankan html2pdf
+        const element = document.getElementById('pdf-content');
+        const opt = {
+            margin: 0.2,
+            filename: 'OPR_SJKCKM1.pdf',
+            image: { type: 'jpeg', quality: 0.90 }, // Kurangkan kualiti sedikit untuk kelajuan
+            html2canvas: { scale: 1.5, useCORS: true }, // Scale 1.5 sudah cukup jelas dan laju
+            jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(element).save().then(() => {
+            loading.style.display = 'none';
+        }).catch(err => {
+            alert("Ralat menjana PDF. Cuba gunakan gambar yang lebih kecil.");
+            loading.style.display = 'none';
         });
-
-        // Tunggu semua gambar aktiviti dimuatkan
-        await Promise.all(imagePromises);
-
-        // Tunggu ekstra 1 saat untuk pastikan logo sekolah & jata negara 'ready'
-        setTimeout(() => {
-            const element = document.getElementById('pdf-content');
-            html2pdf().set({
-                margin: 0.2,
-                filename: 'OPR_SJKCKM1_STABIL.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { 
-                    scale: 2, 
-                    useCORS: true, 
-                    logging: true,
-                    allowTaint: false
-                },
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-            }).from(element).save().then(() => {
-                btn.innerText = "JANA PDF";
-                btn.disabled = false;
-            });
-        }, 1200);
     }
 </script>
 </body>
