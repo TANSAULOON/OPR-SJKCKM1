@@ -2,13 +2,13 @@
 <html lang="ms">
 <head>
     <meta charset="UTF-8">
-    <title>OPR SJKC KM1 - VERSI FINAL</title>
+    <title>OPR SJKC KM1 - VERSI RESET</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f4f7f6; padding: 20px; font-family: sans-serif; }
-        .container { max-width: 850px; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        body { background-color: #f0f2f5; padding: 20px; font-family: 'Segoe UI', Arial, sans-serif; }
+        .container { max-width: 850px; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         
-        /* Bahagian Preview - Wajib nampak gambar di sini sebelum cetak */
+        /* Bahagian Laporan */
         #printable-area { border: 1px solid #000; padding: 15mm; margin-top: 25px; background: white; }
 
         @media print {
@@ -20,48 +20,61 @@
         }
 
         table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
-        th, td { border: 1px solid black !important; padding: 8px; font-size: 10pt; vertical-align: top; }
-        th { background-color: #f2f2f2 !important; width: 22%; }
+        th, td { border: 1.2px solid black !important; padding: 8px; font-size: 10.5pt; vertical-align: top; color: black; }
+        th { background-color: #f2f2f2 !important; width: 22%; font-weight: bold; }
         
         .grid-gambar { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .img-box { height: 180px; border: 1px solid #000; display: flex; align-items: center; justify-content: center; background: #eee; }
+        .img-box { height: 185px; border: 1px solid #000; display: flex; align-items: center; justify-content: center; background: #fafafa; }
         .img-box img { max-height: 100%; max-width: 100%; object-fit: contain; }
+
+        /* Gaya Butang */
+        .btn-reset-besar { 
+            padding: 20px; 
+            font-size: 1.2rem; 
+            font-weight: bold; 
+            border-radius: 10px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
 
 <div class="container no-print">
-    <div class="alert alert-success"><strong>Data Anda Selamat:</strong> Teks yang anda taip sebelum ini akan muncul secara automatik. </div>
-    <h4 class="text-center fw-bold mb-3">PENJANA OPR SJKC KM1</h4>
-
+    <h3 class="text-center fw-bold text-primary mb-4">PENJANA OPR SJKC KM1</h3>
+    
     <form id="oprForm">
-        <div class="row g-2">
-            <div class="col-12"><label class="small fw-bold">NAMA PROGRAM</label><input type="text" id="i1" class="form-control" oninput="updateAll()"></div>
-            <div class="col-md-6"><label class="small fw-bold">ANJURAN</label><input type="text" id="i2" class="form-control" oninput="updateAll()"></div>
-            <div class="col-md-3"><label class="small fw-bold">TARIKH</label><input type="date" id="i3" class="form-control" oninput="updateAll()"></div>
-            <div class="col-md-3"><label class="small fw-bold">MASA</label><input type="text" id="i4" class="form-control" oninput="updateAll()"></div>
-            <div class="col-md-6"><label class="small fw-bold">TEMPAT</label><input type="text" id="i5" class="form-control" oninput="updateAll()"></div>
-            <div class="col-md-6"><label class="small fw-bold">SASARAN</label><input type="text" id="i6" class="form-control" oninput="updateAll()"></div>
-            <div class="col-12"><label class="small fw-bold">OBJEKTIF</label><textarea id="i7" class="form-control" rows="2" oninput="updateAll()"></textarea></div>
-            <div class="col-12"><label class="small fw-bold">AKTIVITI</label><textarea id="i8" class="form-control" rows="2" oninput="updateAll()"></textarea></div>
-            <div class="col-md-6"><label class="small fw-bold">KEKUATAN</label><textarea id="i9" class="form-control" rows="2" oninput="updateAll()"></textarea></div>
-            <div class="col-md-6"><label class="small fw-bold">KELEMAHAN</label><textarea id="i10" class="form-control" rows="2" oninput="updateAll()"></textarea></div>
-            <div class="col-md-6"><label class="small fw-bold">DISEDIAKAN OLEH</label><input type="text" id="i11" class="form-control" oninput="updateAll()"></div>
-            <div class="col-md-6"><label class="small fw-bold">DISAHKAN OLEH</label><input type="text" id="i12" class="form-control" oninput="updateAll()"></div>
-            <div class="col-12"><label class="fw-bold text-primary">MASUKKAN GAMBAR (1-4)</label><input type="file" id="iImg" class="form-control border-primary" multiple accept="image/*" onchange="loadImages()"></div>
+        <div class="row g-3">
+            <div class="col-12"><label class="fw-bold">NAMA PROGRAM</label><input type="text" id="i1" class="form-control" oninput="updateAll()"></div>
+            <div class="col-md-6"><label class="fw-bold small">ANJURAN</label><input type="text" id="i2" class="form-control" oninput="updateAll()"></div>
+            <div class="col-md-3"><label class="fw-bold small">TARIKH</label><input type="date" id="i3" class="form-control" oninput="updateAll()"></div>
+            <div class="col-md-3"><label class="fw-bold small">MASA</label><input type="text" id="i4" class="form-control" oninput="updateAll()" placeholder="cth: 11:30 PAGI"></div>
+            <div class="col-md-6"><label class="fw-bold small">TEMPAT</label><input type="text" id="i5" class="form-control" oninput="updateAll()"></div>
+            <div class="col-md-6"><label class="fw-bold small">SASARAN</label><input type="text" id="i6" class="form-control" oninput="updateAll()"></div>
+            <div class="col-12"><label class="fw-bold small">OBJEKTIF</label><textarea id="i7" class="form-control" rows="2" oninput="updateAll()"></textarea></div>
+            <div class="col-12"><label class="fw-bold small">AKTIVITI</label><textarea id="i8" class="form-control" rows="2" oninput="updateAll()"></textarea></div>
+            <div class="col-md-6"><label class="fw-bold small">KEKUATAN</label><textarea id="i9" class="form-control" rows="2" oninput="updateAll()"></textarea></div>
+            <div class="col-md-6"><label class="fw-bold small">KELEMAHAN</label><textarea id="i10" class="form-control" rows="2" oninput="updateAll()"></textarea></div>
+            <div class="col-md-6"><label class="fw-bold small">DISEDIAKAN OLEH</label><input type="text" id="i11" class="form-control" oninput="updateAll()"></div>
+            <div class="col-md-6"><label class="fw-bold small">DISAHKAN OLEH</label><input type="text" id="i12" class="form-control" oninput="updateAll()"></div>
+            <div class="col-12"><label class="fw-bold text-primary">MUAT NAIK GAMBAR (1-4 Keping)</label><input type="file" id="iImg" class="form-control border-primary" multiple accept="image/*" onchange="loadImages()"></div>
         </div>
-        <button type="button" onclick="window.print()" class="btn btn-danger w-100 mt-4 fw-bold p-3">SIMPAN PDF (PASTIKAN GAMBAR DI BAWAH SUDAH MUNCUL)</button>
+        
+        <div class="d-grid gap-2 mt-4">
+            <button type="button" onclick="window.print()" class="btn btn-primary p-3 fw-bold shadow">1. SIMPAN PDF</button>
+            <button type="button" onclick="padamSemua()" class="btn btn-danger btn-reset-besar shadow">2. RESET BORANG (MULA BARU)</button>
+        </div>
+        <p class="text-center mt-3 text-muted small">Nota: Gambar perlu dimuat naik semula setiap kali anda buka laman ini.</p>
     </form>
 </div>
 
 <div id="printable-area">
     <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid black; padding-bottom:10px; margin-bottom:15px;">
-        <img src="https://i.postimg.cc/PJwfS3KM/Jata-Malaysia-V2-svg.png" width="60" onload="console.log('Logo 1 Loaded')">
+        <img src="https://i.postimg.cc/PJwfS3KM/Jata-Malaysia-V2-svg.png" width="60">
         <div style="text-align:center;">
-            <div style="font-weight:bold; font-size:12pt;">LAPORAN ONE PAGE REPORT (OPR) [cite: 70]</div>
-            <div style="font-weight:bold; font-size:12pt;">SJKC KONG MIN CAWANGAN SATU [cite: 70]</div>
+            <div style="font-weight:bold; font-size:12pt; margin-bottom:2px;">LAPORAN ONE PAGE REPORT (OPR)</div>
+            <div style="font-weight:bold; font-size:12pt;">SJKC KONG MIN CAWANGAN SATU</div>
         </div>
-        <img src="https://i.postimg.cc/fR4SQX9P/SJKC-KONG-MIN-CAWANGAN-SATU.png" width="60" onload="console.log('Logo 2 Loaded')">
+        <img src="https://i.postimg.cc/fR4SQX9P/SJKC-KONG-MIN-CAWANGAN-SATU.png" width="60">
     </div>
 
     <table>
@@ -75,21 +88,22 @@
     </table>
 
     <div class="grid-gambar" id="oImg">
-        <div class="img-box">Tiada Gambar</div><div class="img-box">Tiada Gambar</div>
-        <div class="img-box">Tiada Gambar</div><div class="img-box">Tiada Gambar</div>
+        <div class="img-box">Gambar 1</div><div class="img-box">Gambar 2</div>
+        <div class="img-box">Gambar 3</div><div class="img-box">Gambar 4</div>
     </div>
 
-    <div style="display:flex; justify-content:space-between; margin-top:30px;">
+    <div style="display:flex; justify-content:space-between; margin-top:40px;">
         <div style="width:45%">Disediakan oleh:<br><br><br>____________________<br>(<span id="o11" style="font-weight:bold;"></span>)</div>
         <div style="width:45%; text-align:right;">Disahkan oleh:<br><br><br>____________________<br>(<span id="o12" style="font-weight:bold;"></span>)</div>
     </div>
 </div>
 
 <script>
+    // Fungsi Auto-Save Teks
     function updateAll() {
         for(let i=1; i<=12; i++) {
             let val = document.getElementById('i'+i).value;
-            localStorage.setItem('opr_save_'+i, val);
+            localStorage.setItem('opr_final_save_'+i, val);
             if(i === 3) {
                 document.getElementById('o34').innerText = val + " / " + document.getElementById('i4').value;
             } else if(i !== 4) {
@@ -98,10 +112,12 @@
         }
     }
 
+    // Fungsi Preview Gambar
     function loadImages() {
         const outImg = document.getElementById('oImg');
         const files = Array.from(document.getElementById('iImg').files).slice(0, 4);
-        outImg.innerHTML = '';
+        if(files.length > 0) outImg.innerHTML = '';
+        
         files.forEach(file => {
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -111,9 +127,18 @@
         });
     }
 
+    // Fungsi RESET BESAR
+    function padamSemua() {
+        if(confirm("Adakah anda pasti mahu memadam semua maklumat dan memulakan laporan baru?")) {
+            localStorage.clear();
+            location.reload();
+        }
+    }
+
+    // Load Data Bila Buka Page
     window.onload = function() {
         for(let i=1; i<=12; i++) {
-            let saved = localStorage.getItem('opr_save_'+i);
+            let saved = localStorage.getItem('opr_final_save_'+i);
             if(saved) document.getElementById('i'+i).value = saved;
         }
         updateAll();
