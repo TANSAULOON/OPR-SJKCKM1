@@ -2,160 +2,146 @@
 <html lang="ms">
 <head>
     <meta charset="UTF-8">
-    <title>OPR KM1 - Versi Lite</title>
+    <title>OPR KM1 - Versi Cetak</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        body { background-color: #f4f7f6; padding: 15px; font-family: sans-serif; }
-        .container { max-width: 800px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        
-        #loading-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.9); z-index: 9999; text-align: center; padding-top: 20%;
-        }
+        /* Gaya untuk Skrin (Borang) */
+        body { background-color: #f4f7f6; padding: 20px; font-family: sans-serif; }
+        .container { max-width: 800px; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        #report-preview { display: none; } /* Sorok report masa isi borang */
 
-        #pdf-area { position: absolute; left: -9999px; top: 0; }
-        .report-page { width: 7.9in; padding: 0.3in; background: white; display: flex; flex-direction: column; }
-        .header-table { width: 100%; border-bottom: 2px solid black; margin-bottom: 8px; }
-        .header-table td { border: none !important; padding: 2px !important; vertical-align: middle; }
-        
-        .pdf-table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
-        .pdf-table th, .pdf-table td { border: 1px solid black; padding: 5px 8px; font-size: 8.5pt; vertical-align: top; }
-        .pdf-table th { width: 22%; background-color: #f2f2f2; }
-        
-        .grid-gambar { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 10px; }
-        /* Paksa gambar jadi kecil guna CSS sahaja (tidak guna skrip berat) */
-        .img-container { height: 130px; border: 1px solid #eee; display: flex; align-items: center; justify-content: center; }
-        .img-container img { max-height: 100%; max-width: 100%; object-fit: contain; }
-        
-        .footer-sig { display: flex; justify-content: space-between; font-size: 9pt; margin-top: auto; padding-top: 10px; }
-        .sig-box { width: 45%; }
-        .sig-line { border-bottom: 1px solid black; width: 100%; display: block; height: 30px; margin-bottom: 5px; }
+        /* Gaya Khas untuk Cetakan (PDF) */
+        @media print {
+            .no-print { display: none !important; } /* Sorok borang masa cetak */
+            #report-preview { display: block !important; } /* Tunjuk report sahaja */
+            body { background: white; padding: 0; }
+            .report-page { 
+                width: 210mm; min-height: 297mm; 
+                padding: 10mm; margin: 0 auto;
+                display: flex; flex-direction: column;
+            }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+            th, td { border: 1px solid black !important; padding: 6px 10px; font-size: 10pt; vertical-align: top; }
+            th { background-color: #f2f2f2 !important; -webkit-print-color-adjust: exact; }
+            .grid-gambar { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+            .img-box { height: 180px; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+            .img-box img { max-height: 100%; max-width: 100%; object-fit: contain; }
+            .footer-sig { display: flex; justify-content: space-between; margin-top: auto; padding-top: 20px; }
+            .sig-box { width: 40%; }
+            .sig-line { border-bottom: 1px solid black; display: block; height: 40px; margin-bottom: 5px; }
+        }
     </style>
 </head>
 <body>
 
-<div id="loading-overlay">
-    <div class="spinner-border text-primary"></div>
-    <h3 class="mt-3">Sedang Menyimpan PDF...</h3>
-    <p>Jika ia mengambil masa lebih 30 saat, sila gunakan gambar yang lebih kecil.</p>
-</div>
-
 <div class="container no-print">
-    <h4 class="text-center fw-bold mb-3">OPR SJKC KM1 (VERSI LITE)</h4>
-    <form id="formOPR">
-        <div class="row g-2">
-            <div class="col-12"><label class="small fw-bold">NAMA PROGRAM</label><input type="text" id="in1" class="form-control form-control-sm"></div>
-            <div class="col-md-6"><label class="small fw-bold">ANJURAN</label><input type="text" id="in2" class="form-control form-control-sm"></div>
-            <div class="col-md-3"><label class="small fw-bold">TARIKH</label><input type="date" id="in3" class="form-control form-control-sm"></div>
-            <div class="col-md-3"><label class="small fw-bold">MASA</label><input type="text" id="in4" class="form-control form-control-sm"></div>
-            
-            <div class="col-md-6"><label class="small fw-bold">TEMPAT</label><input type="text" id="in5" class="form-control form-control-sm"></div>
-            <div class="col-md-6"><label class="small fw-bold">SASARAN</label><input type="text" id="in6" class="form-control form-control-sm"></div>
-            
-            <div class="col-12"><label class="small fw-bold">OBJEKTIF</label><textarea id="in7" class="form-control form-control-sm" rows="2"></textarea></div>
-            <div class="col-12"><label class="small fw-bold">AKTIVITI</label><textarea id="in8" class="form-control form-control-sm" rows="2"></textarea></div>
-            
-            <div class="col-md-6"><label class="small fw-bold">KEKUATAN</label><textarea id="in9" class="form-control form-control-sm" rows="2"></textarea></div>
-            <div class="col-md-6"><label class="small fw-bold">KELEMAHAN</label><textarea id="in10" class="form-control form-control-sm" rows="2"></textarea></div>
-            
-            <div class="col-md-6"><label class="small fw-bold">DISEDIAKAN OLEH:</label><input type="text" id="inPenyedia" class="form-control form-control-sm"></div>
-            <div class="col-md-6"><label class="small fw-bold">DISAHKAN OLEH:</label><input type="text" id="inPengesah" class="form-control form-control-sm"></div>
-            
-            <div class="col-12"><label class="small fw-bold">GAMBAR (Pilih 1-4)</label><input type="file" id="inImg" class="form-control form-control-sm" multiple accept="image/*"></div>
+    <div class="text-center mb-4">
+        <h3 class="fw-bold text-primary">PENJANA OPR SJKC KM1</h3>
+        <p class="text-muted small">Versi Stabil: Menggunakan Sistem Cetakan Peranti</p>
+    </div>
+    
+    <form id="oprForm">
+        <div class="row g-3">
+            <div class="col-12"><label class="fw-bold small">NAMA PROGRAM</label><input type="text" id="i1" class="form-control"></div>
+            <div class="col-md-6"><label class="fw-bold small">ANJURAN</label><input type="text" id="i2" class="form-control"></div>
+            <div class="col-md-3"><label class="fw-bold small">TARIKH</label><input type="date" id="i3" class="form-control"></div>
+            <div class="col-md-3"><label class="fw-bold small">MASA</label><input type="text" id="i4" class="form-control"></div>
+            <div class="col-md-6"><label class="fw-bold small">TEMPAT</label><input type="text" id="i5" class="form-control"></div>
+            <div class="col-md-6"><label class="fw-bold small">SASARAN</label><input type="text" id="i6" class="form-control"></div>
+            <div class="col-12"><label class="fw-bold small">OBJEKTIF</label><textarea id="i7" class="form-control" rows="2"></textarea></div>
+            <div class="col-12"><label class="fw-bold small">AKTIVITI</label><textarea id="i8" class="form-control" rows="2"></textarea></div>
+            <div class="col-md-6"><label class="fw-bold small">KEKUATAN</label><textarea id="i9" class="form-control" rows="2"></textarea></div>
+            <div class="col-md-6"><label class="fw-bold small">KELEMAHAN</label><textarea id="i10" class="form-control" rows="2"></textarea></div>
+            <div class="col-md-6"><label class="fw-bold small">DISEDIAKAN OLEH</label><input type="text" id="i11" class="form-control" placeholder="Nama & Jawatan"></div>
+            <div class="col-md-6"><label class="fw-bold small">DISAHKAN OLEH</label><input type="text" id="i12" class="form-control" placeholder="Nama & Jawatan"></div>
+            <div class="col-12"><label class="fw-bold small text-danger">PILIH GAMBAR (1-4)</label><input type="file" id="iImg" class="form-control" multiple accept="image/*"></div>
         </div>
-        <button type="button" onclick="buatPDF()" class="btn btn-success w-100 mt-3 fw-bold shadow">SIMPAN PDF</button>
+        
+        <button type="button" onclick="janaDanCetak()" class="btn btn-primary w-100 mt-4 py-2 fw-bold shadow">BUAT PDF SEKARANG</button>
     </form>
 </div>
 
-<div id="pdf-area">
-    <div class="report-page" id="pdf-content">
-        <table class="header-table">
-            <tr>
-                <td style="width: 15%;"><img src="https://i.postimg.cc/PJwfS3KM/Jata-Malaysia-V2-svg.png" height="40" crossorigin="anonymous"></td>
-                <td style="text-align: center;">
-                    <div style="font-size: 11pt; font-weight: bold;">LAPORAN ONE PAGE REPORT (OPR)</div>
-                    <div style="font-size: 11pt; font-weight: bold;">SJKC KONG MIN CAWANGAN SATU</div>
+<div id="report-preview">
+    <div class="report-page">
+        <table style="border: none !important;">
+            <tr style="border: none !important;">
+                <td style="width: 15%; border: none !important;"><img src="https://i.postimg.cc/PJwfS3KM/Jata-Malaysia-V2-svg.png" height="50"></td>
+                <td style="text-align: center; border: none !important; vertical-align: middle;">
+                    <div style="font-size: 12pt; font-weight: bold;">LAPORAN ONE PAGE REPORT (OPR)</div>
+                    <div style="font-size: 12pt; font-weight: bold;">SJKC KONG MIN CAWANGAN SATU</div>
                 </td>
-                <td style="width: 15%; text-align: right;"><img src="https://i.postimg.cc/fR4SQX9P/SJKC-KONG-MIN-CAWANGAN-SATU.png" height="40" crossorigin="anonymous"></td>
+                <td style="width: 15%; border: none !important; text-align: right;"><img src="https://i.postimg.cc/fR4SQX9P/SJKC-KONG-MIN-CAWANGAN-SATU.png" height="50"></td>
             </tr>
         </table>
 
-        <table class="pdf-table">
-            <tr><th>Program</th><td colspan="3" id="out1" style="font-weight:bold; text-transform:uppercase;"></td></tr>
-            <tr><th>Anjuran</th><td id="out2"></td><th>Tarikh/Masa</th><td id="out34"></td></tr>
-            <tr><th>Tempat</th><td id="out5"></td><th>Sasaran</th><td id="out6"></td></tr>
-            <tr><th>Objektif</th><td colspan="3" id="out7"></td></tr>
-            <tr><th>Aktiviti</th><td colspan="3" id="out8"></td></tr>
-            <tr><th>Kekuatan</th><td colspan="3" id="out9"></td></tr>
-            <tr><th>Kelemahan</th><td colspan="3" id="out10"></td></tr>
+        <table>
+            <tr><th style="width: 20%;">Program</th><td colspan="3" id="o1" style="font-weight: bold; text-transform: uppercase;"></td></tr>
+            <tr><th style="width: 20%;">Anjuran</th><td id="o2"></td><th style="width: 20%;">Tarikh/Masa</th><td id="o34"></td></tr>
+            <tr><th>Tempat</th><td id="o5"></td><th>Sasaran</th><td id="o6"></td></tr>
+            <tr><th>Objektif</th><td colspan="3" id="o7"></td></tr>
+            <tr><th>Aktiviti</th><td colspan="3" id="o8"></td></tr>
+            <tr><th>Kekuatan</th><td colspan="3" id="o9"></td></tr>
+            <tr><th>Kelemahan</th><td colspan="3" id="o10"></td></tr>
         </table>
 
-        <div class="grid-gambar" id="outImg"></div>
+        <div class="grid-gambar" id="oImg"></div>
 
         <div class="footer-sig">
-            <div class="sig-box">Disediakan oleh:<br><span class="sig-line"></span>(<span id="outPenyedia" style="font-weight:bold;"></span>)</div>
-            <div class="sig-box" style="text-align: right;">Disahkan oleh:<br><span class="sig-line"></span>(<span id="outPengesah" style="font-weight:bold;"></span>)</div>
+            <div class="sig-box">
+                Disediakan oleh:<br><span class="sig-line"></span>(<span id="o11" style="font-weight: bold; text-transform: uppercase;"></span>)
+            </div>
+            <div class="sig-box" style="text-align: right;">
+                Disahkan oleh:<br><span class="sig-line"></span>(<span id="o12" style="font-weight: bold; text-transform: uppercase;"></span>)
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    function buatPDF() {
-        const overlay = document.getElementById('loading-overlay');
-        overlay.style.display = 'block';
+    function janaDanCetak() {
+        // 1. Pindahkan Data
+        document.getElementById('o1').innerText = document.getElementById('i1').value;
+        document.getElementById('o2').innerText = document.getElementById('i2').value;
+        document.getElementById('o34').innerText = document.getElementById('i3').value + " / " + document.getElementById('i4').value;
+        document.getElementById('o5').innerText = document.getElementById('i5').value;
+        document.getElementById('o6').innerText = document.getElementById('i6').value;
+        document.getElementById('o7').innerText = document.getElementById('i7').value;
+        document.getElementById('o8').innerText = document.getElementById('i8').value;
+        document.getElementById('o9').innerText = document.getElementById('i9').value;
+        document.getElementById('o10').innerText = document.getElementById('i10').value;
+        document.getElementById('o11').innerText = document.getElementById('i11').value;
+        document.getElementById('o12').innerText = document.getElementById('i12').value;
 
-        // Pindahkan data teks
-        document.getElementById('out1').innerText = document.getElementById('in1').value;
-        document.getElementById('out2').innerText = document.getElementById('in2').value;
-        document.getElementById('out34').innerText = document.getElementById('in3').value + " / " + document.getElementById('in4').value;
-        document.getElementById('out5').innerText = document.getElementById('in5').value;
-        document.getElementById('out6').innerText = document.getElementById('in6').value;
-        document.getElementById('out7').innerText = document.getElementById('in7').value;
-        document.getElementById('out8').innerText = document.getElementById('in8').value;
-        document.getElementById('out9').innerText = document.getElementById('in9').value;
-        document.getElementById('out10').innerText = document.getElementById('in10').value;
-        document.getElementById('outPenyedia').innerText = document.getElementById('inPenyedia').value.toUpperCase();
-        document.getElementById('outPengesah').innerText = document.getElementById('inPengesah').value.toUpperCase();
-
-        const outImg = document.getElementById('outImg');
+        // 2. Papar Gambar
+        const outImg = document.getElementById('oImg');
         outImg.innerHTML = '';
-        const files = Array.from(document.getElementById('inImg').files).slice(0, 4);
+        const files = Array.from(document.getElementById('iImg').files).slice(0, 4);
         
-        // Guna kaedah paling ringkas untuk paparkan gambar
-        let loadedCount = 0;
-        if (files.length === 0) {
-            janaPDF();
-        } else {
-            files.forEach(f => {
-                const rd = new FileReader();
-                rd.onload = (e) => {
-                    const div = document.createElement('div');
-                    div.className = 'img-container';
-                    div.innerHTML = `<img src="${e.target.result}">`;
-                    outImg.appendChild(div);
-                    loadedCount++;
-                    if (loadedCount === files.length) {
-                        setTimeout(janaPDF, 500);
+        if (files.length > 0) {
+            let processed = 0;
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    outImg.innerHTML += `<div class="img-box"><img src="${e.target.result}"></div>`;
+                    processed++;
+                    if (processed === files.length) {
+                        mulakanCetak();
                     }
                 };
-                rd.readAsDataURL(f);
+                reader.readAsDataURL(file);
             });
+        } else {
+            mulakanCetak();
         }
 
-        function janaPDF() {
-            const element = document.getElementById('pdf-content');
-            html2pdf().set({
-                margin: 0.2,
-                filename: 'OPR_SJKC_KM1.pdf',
-                image: { type: 'jpeg', quality: 0.7 }, // Kualiti rendah untuk elakkan hang
-                html2canvas: { scale: 1.2, useCORS: true }, // Scale rendah untuk kelajuan
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-            }).from(element).save().then(() => {
-                overlay.style.display = 'none';
-            });
+        function mulakanCetak() {
+            // Beri masa 0.5 saat untuk browser render gambar
+            setTimeout(() => {
+                window.print();
+            }, 500);
         }
     }
 </script>
+
 </body>
 </html>
